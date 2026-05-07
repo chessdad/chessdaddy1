@@ -1,161 +1,115 @@
 import { Chess } from 'chess.js';
 
-export interface ParsedGame {
-  headers: { [key: string]: string };
+interface ParsedGame {
   moves: string[];
   result: string;
-  moveTexts: string[];
+  white: string;
+  black: string;
+  event: string;
 }
 
 export class PGNParser {
-  /**
-   * Parse PGN string into structured game data
-   */
   static parseGame(pgn: string): ParsedGame {
-    const lines = pgn.split('\n');
-    const headers: { [key: string]: string } = {};
-    let movesStartIndex = 0;
+    const game: ParsedGame = {
+      moves: [],
+      result: '*',
+      white: '?',
+      black: '?',
+      event: '?'
+    };
 
     // Parse headers
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (line.startsWith('[')) {
-        const match = line.match(/\[(\w+)\s+"(.*)"\]/);
-        if (match) {
-          headers[match[1]] = match[2];
-        }
-      } else if (line && !line.startsWith('[')) {
-        movesStartIndex = i;
-        break;
-      }
+    const headerRegex = /\[(\w+)\s+"([^"]*)"/g;
+    let match;
+    while ((match = headerRegex.exec(pgn)) !== null) {
+      const [, key, value] = match;
+      if (key === 'White') game.white = value;
+      if (key === 'Black') game.black = value;
+      if (key === 'Event') game.event = value;
+      if (key === 'Result') game.result = value;
     }
 
     // Parse moves
-    const movesText = lines.slice(movesStartIndex).join(' ');
-    const moves = this.extractMoves(movesText);
-    const result = headers['Result'] || '*';
-
-    return {
-      headers,
-      moves,
-      result,
-      moveTexts: moves
-    };
-  }
-
-  /**
-   * Extract individual moves from PGN text
-   */
-  private static extractMoves(text: string): string[] {
-    const moves: string[] = [];
+    const movesSection = pgn.replace(/\[.*?\]/gs, '').trim();
+    const tokens = movesSection.split(/\s+/);
     const chess = new Chess();
 
-    // Remove comments and variations
-    let cleaned = text
-      .replace(/\{[^}]*\}/g, '') // Remove comments
-      .replace(/\([^)]*\)/g, '') // Remove variations
-      .replace(/\d+\./g, '') // Remove move numbers
-      .trim();
-
-    // Split by whitespace
-    const tokens = cleaned.split(/\s+/);
-
     for (const token of tokens) {
-      if (!token) continue;
-
-      // Skip result indicators
-      if (['1-0', '0-1', '1/2-1/2', '*'].includes(token)) {
+      // Skip move numbers and result markers
+      if (/^\d+\./.test(token) || /^[01*-]/.test(token)) {
         continue;
       }
 
       try {
-        const move = chess.move(token, { sloppy: true });
+        const move = chess.move(token);
         if (move) {
-          moves.push(`${move.from}${move.to}`);
+          game.moves.push(`${move.from}${move.to}`);
         }
       } catch (e) {
-        // Skip invalid moves
+        // Skip invalid tokens
+        continue;
       }
     }
 
-    return moves;
+    return game;
   }
 
-  /**
-   * Convert UCI notation to algebraic notation
-   */
   static toAlgebraic(from: string, to: string, chess: Chess): string {
     try {
-      const move = chess.move({ from, to, promotion: 'q' }, { sloppy: true });
+      const move = chess.move({ from, to, promotion: 'q' });
       if (move) {
         return move.san;
       }
     } catch (e) {
-      // Fallback
+      // Ignore error
     }
     return `${from}${to}`;
   }
 
-  /**
-   * Validate PGN format
-   */
   static isValidPGN(pgn: string): boolean {
-    try {
-      const chess = new Chess();
-      const game = this.parseGame(pgn);
+    const chess = new Chess();
+    const movesSection = pgn.replace(/\[.*?\]/gs, '').trim();
+    const tokens = movesSection.split(/\s+/);
+
+    chess.reset();
+
+    for (const move of tokens) {
+      if (/^\d+\./.test(move) || /^[01*-]/.test(move)) {
+        continue;
+      }
       
-      for (const move of game.moves) {
-        const result = chess.move(move, { sloppy: true });
+      try {
+        const result = chess.move(move);
         if (!result) {
           return false;
         }
+      } catch (e) {
+        return false;
       }
-      return true;
-    } catch (e) {
-      return false;
     }
+
+    return true;
   }
 
-  /**
-   * Generate PGN from game
-   */
-  static generatePGN(
-    moves: string[],
-    headers: { [key: string]: string } = {}
-  ): string {
-    let pgn = '';
-
-    // Add headers
-    const defaultHeaders = {
-      Event: 'ChessDaddy Game',
-      Site: 'Local',
-      Date: new Date().toISOString().split('T')[0],
-      Round: '1',
-      White: 'Player',
-      Black: 'Engine',
-      Result: '*'
-    };
-
-    const allHeaders = { ...defaultHeaders, ...headers };
-    for (const [key, value] of Object.entries(allHeaders)) {
-      pgn += `[${key} "${value}"]\n`;
-    }
-
-    pgn += '\n';
-
-    // Add moves
+  static toPGN(moves: string[]): string {
     const chess = new Chess();
+    let pgn = '';
+    let moveNumber = 1;
+
     for (let i = 0; i < moves.length; i++) {
       if (i % 2 === 0) {
-        pgn += `${Math.floor(i / 2) + 1}. `;
+        pgn += `${moveNumber}. `;
       }
 
-      const move = chess.move(moves[i], { sloppy: true });
+      const move = chess.move(moves[i]);
       if (move) {
         pgn += `${move.san} `;
+        if (i % 2 === 1) {
+          moveNumber++;
+        }
       }
     }
 
-    return pgn;
+    return pgn.trim();
   }
 }

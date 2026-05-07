@@ -1,65 +1,32 @@
 import { Chess } from 'chess.js';
-
-export interface Puzzle {
-  id: string;
-  fen: string;
-  solution: string[];
-  theme: 'mate' | 'fork' | 'pin' | 'skewer' | 'sacrifice' | 'defense';
-  difficulty: number;
-  rating: number;
-}
+import { StockfishWorker } from './StockfishWorker';
 
 export class PuzzleGenerator {
-  /**
-   * Generate puzzles from a PGN string
-   * In a real implementation, this would use Stockfish to analyze positions
-   */
-  public generateFromPGN(pgn: string): Puzzle[] {
-    const puzzles: Puzzle[] = [];
+  static async generateFromPGN(pgn: string): Promise<string[]> {
     const chess = new Chess();
+    const puzzles: string[] = [];
 
     try {
-      chess.load_pgn(pgn);
+      chess.loadPgn(pgn);
       const moves = chess.moves({ verbose: true });
 
       // Analyze significant positions
-      for (let i = 0; i < moves.length; i++) {
+      for (let i = 0; i < moves.length - 1; i++) {
         const move = moves[i];
-        chess.move(move);
-
-        // In a real app, evaluate position for tactical opportunities
-        // Check for patterns like forks, pins, skewers, etc.
-
-        chess.undo();
+        if (this.isSignificantMove(move)) {
+          const position = chess.fen();
+          puzzles.push(position);
+        }
       }
-    } catch (error) {
-      console.error('Error generating puzzles:', error);
+    } catch (e) {
+      console.error('Error generating puzzles from PGN:', e);
     }
 
     return puzzles;
   }
 
-  /**
-   * Rate puzzle difficulty based on complexity
-   */
-  public ratePuzzle(puzzle: Puzzle): number {
-    let rating = 500; // Base rating
-
-    // Add difficulty based on solution length
-    rating += puzzle.solution.length * 100;
-
-    // Add difficulty based on theme
-    const themeMultiplier: { [key: string]: number } = {
-      mate: 1.5,
-      sacrifice: 1.3,
-      fork: 1.0,
-      pin: 1.1,
-      skewer: 1.2,
-      defense: 0.9
-    };
-
-    rating *= themeMultiplier[puzzle.theme] || 1.0;
-
-    return Math.min(3000, Math.max(500, Math.round(rating)));
+  private static isSignificantMove(move: any): boolean {
+    // Consider moves significant if they involve captures or checks
+    return move.capture !== undefined || move.check === true;
   }
 }
