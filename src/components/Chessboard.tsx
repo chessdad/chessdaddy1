@@ -1,57 +1,34 @@
 import React, { useState, useEffect } from 'react';
+import { Chess } from 'chess.js';
 import '../styles/Chessboard.css';
 
 interface ChessboardProps {
   fen: string;
-  onMove?: (from: string, to: string) => void;
-  readOnly?: boolean;
+  onMove: (from: string, to: string) => void;
+  disabled?: boolean;
 }
 
-const SQUARE_SIZE = 60;
-const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1'];
-
-const PIECE_UNICODE: { [key: string]: string } = {
-  'P': '♙', 'N': '♘', 'B': '♗', 'R': '♖', 'Q': '♕', 'K': '♔',
-  'p': '♟', 'n': '♞', 'b': '♝', 'r': '♜', 'q': '♛', 'k': '♚'
-};
-
-const Chessboard: React.FC<ChessboardProps> = ({ fen, onMove, readOnly = false }) => {
+const Chessboard: React.FC<ChessboardProps> = ({ fen, onMove, disabled = false }) => {
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [legalMoves, setLegalMoves] = useState<string[]>([]);
-  const [board, setBoard] = useState<(string | null)[][]>([]);
+  const [chess] = useState(new Chess());
 
   useEffect(() => {
-    updateBoard(fen);
-  }, [fen]);
+    try {
+      chess.load(fen);
+    } catch (e) {
+      console.error('Invalid FEN:', e);
+    }
+  }, [fen, chess]);
 
-  const updateBoard = (fen: string) => {
-    const boardArray: (string | null)[][] = [];
-    const fenParts = fen.split(' ');
-    const position = fenParts[0];
-    const rows = position.split('/');
+  const handleSquareClick = (square: string) => {
+    if (disabled) return;
 
-    rows.forEach((row) => {
-      const boardRow: (string | null)[] = [];
-      for (const char of row) {
-        if (isNaN(Number(char))) {
-          boardRow.push(char);
-        } else {
-          for (let i = 0; i < Number(char); i++) {
-            boardRow.push(null);
-          }
-        }
-      }
-      boardArray.push(boardRow);
-    });
-
-    setBoard(boardArray);
-  };
-
-  const handleSquareClick = (file: number, rank: number) => {
-    if (readOnly) return;
-
-    const square = `${FILES[file]}${RANKS[rank]}`;
+    try {
+      chess.load(fen);
+    } catch (e) {
+      return;
+    }
 
     if (selectedSquare === square) {
       setSelectedSquare(null);
@@ -60,58 +37,89 @@ const Chessboard: React.FC<ChessboardProps> = ({ fen, onMove, readOnly = false }
     }
 
     if (selectedSquare) {
-      onMove?.(selectedSquare, square);
-      setSelectedSquare(null);
-      setLegalMoves([]);
-    } else {
+      try {
+        const move = chess.move({
+          from: selectedSquare,
+          to: square,
+          promotion: 'q'
+        });
+
+        if (move) {
+          onMove(selectedSquare, square);
+          setSelectedSquare(null);
+          setLegalMoves([]);
+          return;
+        }
+      } catch (e) {
+        // Invalid move
+      }
+    }
+
+    // Select new square and show legal moves
+    const moves = chess.moves({ square, verbose: true });
+    if (moves.length > 0) {
       setSelectedSquare(square);
-      // In a real app, fetch legal moves for this square
+      setLegalMoves(moves.map(m => m.to));
+    } else {
+      setSelectedSquare(null);
       setLegalMoves([]);
     }
   };
 
-  return (
-    <div className="chessboard-wrapper">
-      <div className="chessboard">
-        {board.map((row, rankIdx) =>
-          row.map((piece, fileIdx) => {
-            const square = `${FILES[fileIdx]}${RANKS[rankIdx]}`;
-            const isLight = (fileIdx + rankIdx) % 2 === 0;
-            const isSelected = selectedSquare === square;
-            const isLegalMove = legalMoves.includes(square);
+  const renderBoard = () => {
+    const squares = [];
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
 
-            return (
-              <div
-                key={square}
-                className={`square ${isLight ? 'light' : 'dark'} ${
-                  isSelected ? 'selected' : ''
-                } ${isLegalMove ? 'legal-move' : ''}`}
-                onClick={() => handleSquareClick(fileIdx, rankIdx)}
-              >
-                {piece && (
-                  <span className="piece">{PIECE_UNICODE[piece]}</span>
-                )}
-              </div>
-            );
-          })
-        )}
-      </div>
-      <div className="board-labels">
-        <div className="file-labels">
-          {FILES.map((file) => (
-            <div key={file} className="file-label">
-              {file}
-            </div>
-          ))}
+    for (let i = 0; i < 64; i++) {
+      const rank = Math.floor(i / 8);
+      const file = i % 8;
+      const square = files[file] + ranks[rank];
+      const isLightSquare = (rank + file) % 2 === 0;
+      const isSelected = selectedSquare === square;
+      const isLegalMove = legalMoves.includes(square);
+
+      const piece = chess.get(square);
+      const pieceSymbol = piece ? getPieceUnicode(piece) : '';
+
+      squares.push(
+        <div
+          key={square}
+          className={`square ${isLightSquare ? 'light' : 'dark'} ${
+            isSelected ? 'selected' : ''
+          } ${isLegalMove ? 'legal-move' : ''}`}
+          onClick={() => handleSquareClick(square)}
+        >
+          {isLegalMove && <div className="legal-move-indicator" />}
+          {pieceSymbol && <span className="piece">{pieceSymbol}</span>}
         </div>
-        <div className="rank-labels">
-          {RANKS.map((rank) => (
-            <div key={rank} className="rank-label">
-              {rank}
-            </div>
-          ))}
-        </div>
-      </div>
+      );
+    }
+
+    return squares;
+  };
+
+  const getPieceUnicode = (piece: any) => {
+    const symbols: { [key: string]: string } = {
+      p: '♟',
+      n: '♞',
+      b: '♝',
+      r: '♜',
+      q: '♛',
+      k: '♚',
+      P: '♙',
+      N: '♘',
+      B: '♗',
+      R: '♖',
+      Q: '♕',
+      K: '♔'
+    };
+    return symbols[piece.color === 'w' ? piece.type.toUpperCase() : piece.type];
+  };
+
+  return (
+    <div className="chessboard">
+      {renderBoard()}
     </div>
   );
 };

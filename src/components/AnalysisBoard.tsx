@@ -12,35 +12,57 @@ import { PGNParser } from '../services/PGNParser';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/Tabs';
 
 const AnalysisBoard: React.FC = () => {
-  const [chess] = useState(new Chess());
+  const [chess, setChess] = useState(new Chess());
   const [fen, setFen] = useState(chess.fen());
   const [evaluation, setEvaluation] = useState<number>(0);
   const [bestMove, setBestMove] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [moveHistory, setMoveHistory] = useState<string[]>([]);
-  const [depth, setDepth] = useState(20);
+  const [moveHistory, setMoveHistory] = useState<Array<{ from: string; to: string; san: string }>>([]);
   const [pgn, setPgn] = useState('');
   const [analysisDepth, setAnalysisDepth] = useState(20);
-
-  const engine = new StockfishWorker();
+  const [engine] = useState(new StockfishWorker());
 
   useEffect(() => {
     engine.initialize();
+    analyzePosition(chess.fen());
   }, []);
 
-  const handleMove = (sourceSquare: string, targetSquare: string) => {
-    const moves = chess.moves({ verbose: true });
-    const move = moves.find(
-      (m) => m.from === sourceSquare && m.to === targetSquare
-    );
+  const handleMove = (from: string, to: string) => {
+    const newChess = new Chess(fen);
+    const moveObj = newChess.move({
+      from,
+      to,
+      promotion: 'q'
+    });
 
-    if (move) {
-      chess.move(move);
-      const newFen = chess.fen();
+    if (moveObj) {
+      const newFen = newChess.fen();
+      setChess(newChess);
       setFen(newFen);
-      setMoveHistory([...moveHistory, `${sourceSquare}${targetSquare}`]);
+      setMoveHistory([...moveHistory, { from, to, san: moveObj.san }]);
       analyzePosition(newFen);
     }
+  };
+
+  const handleUndo = () => {
+    if (moveHistory.length === 0) return;
+
+    const newChess = new Chess();
+    const newHistory = moveHistory.slice(0, -1);
+
+    for (const move of newHistory) {
+      newChess.move({ from: move.from, to: move.to });
+    }
+
+    const newFen = newChess.fen();
+    setChess(newChess);
+    setFen(newFen);
+    setMoveHistory(newHistory);
+    analyzePosition(newFen);
+  };
+
+  const handleRedo = () => {
+    // TODO: Implement redo
   };
 
   const analyzePosition = async (position: string) => {
@@ -59,8 +81,10 @@ const AnalysisBoard: React.FC = () => {
 
   const handleFENChange = (newFen: string) => {
     try {
-      chess.load(newFen);
+      const newChess = new Chess(newFen);
+      setChess(newChess);
       setFen(newFen);
+      setMoveHistory([]);
       analyzePosition(newFen);
     } catch (error) {
       alert('Invalid FEN');
@@ -69,50 +93,41 @@ const AnalysisBoard: React.FC = () => {
 
   const handlePGNUpload = (content: string) => {
     try {
-      if (PGNParser.isValidPGN(content)) {
-        setPgn(content);
-        const game = PGNParser.parseGame(content);
-        chess.reset();
-        
-        for (const move of game.moves) {
-          try {
-            chess.move(move);
-          } catch (e) {
-            break;
-          }
-        }
-        
-        setFen(chess.fen());
-        setMoveHistory(game.moves);
-        analyzePosition(chess.fen());
-      } else {
-        alert('Invalid PGN format');
+      const parsed = PGNParser.parseGame(content);
+      const newChess = new Chess();
+
+      for (const moveObj of parsed.moves) {
+        newChess.move(moveObj);
       }
+
+      const newFen = newChess.fen();
+      setChess(newChess);
+      setFen(newFen);
+      setMoveHistory(parsed.moves);
+      setPgn(content);
+      analyzePosition(newFen);
     } catch (error) {
-      alert('Error parsing PGN');
+      alert('Error parsing PGN: ' + String(error));
     }
   };
 
   const handleClearBoard = () => {
-    chess.reset();
-    setFen(chess.fen());
+    const newChess = new Chess();
+    setChess(newChess);
+    setFen(newChess.fen());
     setMoveHistory([]);
     setEvaluation(0);
     setBestMove(null);
+    analyzePosition(newChess.fen());
   };
 
   const handleStartPosition = () => {
-    chess.reset();
-    const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-    handleFENChange(startFen);
+    handleFENChange('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
   };
 
-  const handleUndo = () => {
-    chess.undo();
-    setFen(chess.fen());
-    const newHistory = moveHistory.slice(0, -1);
-    setMoveHistory(newHistory);
-    analyzePosition(chess.fen());
+  const handleDepthChange = (newDepth: number) => {
+    setAnalysisDepth(newDepth);
+    analyzePosition(fen);
   };
 
   return (
@@ -122,6 +137,9 @@ const AnalysisBoard: React.FC = () => {
         <div className="board-controls">
           <button onClick={handleUndo} disabled={moveHistory.length === 0} className="control-btn">
             ↶ Undo
+          </button>
+          <button onClick={handleStartPosition} className="control-btn">
+            ⟲ Start
           </button>
           <button onClick={handleClearBoard} className="control-btn">
             Clear
@@ -152,10 +170,10 @@ const AnalysisBoard: React.FC = () => {
                 min="10"
                 max="30"
                 value={analysisDepth}
-                onChange={(e) => setAnalysisDepth(Number(e.target.value))}
+                onChange={(e) => handleDepthChange(Number(e.target.value))}
               />
             </div>
-            <MoveHistory moves={moveHistory} />
+            <MoveHistory moves={moveHistory.map(m => m.san)} />
           </TabsContent>
 
           <TabsContent value="pgn">

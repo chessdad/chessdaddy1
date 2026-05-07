@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../styles/GameAnalyzer.css';
 import { AlertCircle, Download, BarChart3 } from 'lucide-react';
 import { ChessComAPI } from '../services/ChessComAPI';
-import { GameAnalyzer } from '../services/GameAnalyzer';
+import { GameAnalyzer as GameAnalyzerService } from '../services/GameAnalyzer';
 import { PGNParser } from '../services/PGNParser';
 import Chessboard from './Chessboard';
 
@@ -33,14 +33,6 @@ const GameAnalyzerComponent: React.FC = () => {
   const [error, setError] = useState('');
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [analysis, setAnalysis] = useState<GameAnalysisResult | null>(null);
-  const [gameBoard, setGameBoard] = useState('');
-
-  useEffect(() => {
-    const saved = localStorage.getItem('chesscomUsername');
-    if (saved) {
-      setUsername(saved);
-    }
-  }, []);
 
   const handleFetchGames = async () => {
     if (!username.trim()) {
@@ -78,25 +70,12 @@ const GameAnalyzerComponent: React.FC = () => {
     setError('');
 
     try {
-      const analyzer = new GameAnalyzer();
+      const analyzer = new GameAnalyzerService();
       const result = await analyzer.analyzeGame(game.pgn, 20, (progress) => {
         console.log(`Analysis progress: ${(progress * 100).toFixed(0)}%`);
       });
 
-      setAnalysis({
-        totalMoves: result.totalMoves,
-        accuracy: result.accuracy,
-        bestMoveCount: result.bestMoveCount,
-        greatMoveCount: result.greatMoveCount,
-        goodMoveCount: result.goodMoveCount,
-        inaccuracyCount: result.inaccuracyCount,
-        mistakeCount: result.mistakeCount,
-        blunderCount: result.blunderCount
-      });
-
-      // Load game position
-      const parsedGame = PGNParser.parseGame(game.pgn);
-      setGameBoard(game.pgn);
+      setAnalysis(result);
     } catch (err) {
       setError('Failed to analyze game: ' + String(err));
     } finally {
