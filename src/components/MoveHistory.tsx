@@ -9,13 +9,13 @@ const MoveHistory: React.FC<MoveHistoryProps> = ({ moves }) => {
   return (
     <div className="move-history">
       <h3>Move History</h3>
-      <div className="moves-list">
+      <div className="moves-container">
         {moves.length === 0 ? (
-          <p className="empty-state">No moves yet</p>
+          <p className="no-moves">No moves yet</p>
         ) : (
           moves.map((move, index) => (
-            <span key={index} className="move-item">
-              {index + 1}. {move}
+            <span key={index} className="move">
+              {Math.floor(index / 2) + 1}. {move}
             </span>
           ))
         )}

@@ -2,7 +2,7 @@ import React from 'react';
 import '../styles/EvaluationBar.css';
 
 interface EvaluationBarProps {
-  whiteEval: number; // centipawns
+  whiteEval: number;
   blackEval: number;
 }
 
@@ -20,14 +20,8 @@ const EvaluationBar: React.FC<EvaluationBarProps> = ({ whiteEval, blackEval }) =
   return (
     <div className="evaluation-bar-container">
       <div className="evaluation-bar">
-        <div
-          className="white-bar"
-          style={{ width: `${whitePercentage}%` }}
-        />
-        <div
-          className="black-bar"
-          style={{ width: `${100 - whitePercentage}%` }}
-        />
+        <div className="white-bar" style={{ width: `${whitePercentage}%` }} />
+        <div className="black-bar" style={{ width: `${100 - whitePercentage}%` }} />
       </div>
       <div className="eval-values">
         <span className="white-eval">{formatEval(whiteEval)}</span>

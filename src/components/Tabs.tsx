@@ -1,92 +1,63 @@
-import React from 'react';
+import React, { useState, ReactNode } from 'react';
 import '../styles/Tabs.css';
 
 interface TabsProps {
   defaultValue: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const Tabs: React.FC<TabsProps> = ({ defaultValue, children }) => {
-  const [activeTab, setActiveTab] = React.useState(defaultValue);
+const Tabs: React.FC<TabsProps> = ({ defaultValue, children }) => {
+  const [activeTab, setActiveTab] = useState(defaultValue);
 
-  const childrenArray = React.Children.toArray(children);
+  const tabsList = React.Children.toArray(children).find(
+    (child: any) => child?.type?.name === 'TabsList'
+  );
+  const tabsContent = React.Children.toArray(children).filter(
+    (child: any) => child?.type?.name === 'TabsContent'
+  );
 
   return (
-    <div className="tabs-container">
-      {childrenArray.map((child) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child as any, {
-            activeTab,
-            onTabChange: setActiveTab
-          });
-        }
-        return child;
-      })}
+    <div className="tabs">
+      {tabsList}
+      <div className="tabs-content">
+        {React.Children.toArray(tabsContent).map((content: any) =>
+          content?.props?.value === activeTab ? (
+            <div key={content?.props?.value} className="tab-pane">
+              {content?.props?.children}
+            </div>
+          ) : null
+        )}
+      </div>
     </div>
   );
 };
 
 interface TabsListProps {
-  children: React.ReactNode;
-  activeTab?: string;
-  onTabChange?: (tab: string) => void;
+  children: ReactNode;
 }
 
-export const TabsList: React.FC<TabsListProps> = ({
-  children,
-  activeTab,
-  onTabChange
-}) => {
-  return (
-    <div className="tabs-list">
-      {React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child as any, {
-            activeTab,
-            onTabChange
-          });
-        }
-        return child;
-      })}
-    </div>
-  );
-};
+const TabsList: React.FC<TabsListProps> = ({ children }) => (
+  <div className="tabs-list">{children}</div>
+);
 
 interface TabsTriggerProps {
   value: string;
-  children: React.ReactNode;
-  activeTab?: string;
-  onTabChange?: (tab: string) => void;
+  children: ReactNode;
 }
 
-export const TabsTrigger: React.FC<TabsTriggerProps> = ({
-  value,
-  children,
-  activeTab,
-  onTabChange
-}) => {
-  return (
-    <button
-      className={`tab-trigger ${activeTab === value ? 'active' : ''}`}
-      onClick={() => onTabChange?.(value)}
-    >
-      {children}
-    </button>
-  );
-};
+const TabsTrigger: React.FC<TabsTriggerProps> = ({ value, children }) => (
+  <button className="tab-trigger" data-value={value}>
+    {children}
+  </button>
+);
 
 interface TabsContentProps {
   value: string;
-  children: React.ReactNode;
-  activeTab?: string;
+  children: ReactNode;
 }
 
-export const TabsContent: React.FC<TabsContentProps> = ({
-  value,
-  children,
-  activeTab
-}) => {
-  if (activeTab !== value) return null;
+const TabsContent: React.FC<TabsContentProps> = ({ value, children }) => (
+  <div className="tab-content">{children}</div>
+);
 
-  return <div className="tabs-content">{children}</div>;
-};
+export { Tabs, TabsList, TabsTrigger, TabsContent };

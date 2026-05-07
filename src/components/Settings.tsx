@@ -1,123 +1,115 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../styles/Settings.css';
-import { Moon, Sun, Save } from 'lucide-react';
+import { Save, RotateCcw } from 'lucide-react';
 
-interface SettingsProps {
-  darkMode: boolean;
-  onDarkModeChange: (value: boolean) => void;
-}
+const Settings: React.FC = () => {
+  const [settings, setSettings] = useState({
+    engineDepth: 20,
+    boardTheme: 'light',
+    showCoordinates: true,
+    soundEnabled: false,
+    autoAnalyze: true
+  });
 
-const Settings: React.FC<SettingsProps> = ({ darkMode, onDarkModeChange }) => {
-  const [engineDepth, setEngineDepth] = useState(20);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [animationsEnabled, setAnimationsEnabled] = useState(true);
-  const [boardSize, setBoardSize] = useState('medium');
+  const [saved, setSaved] = useState(false);
 
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('appSettings');
-    if (savedSettings) {
-      const settings = JSON.parse(savedSettings);
-      setEngineDepth(settings.engineDepth || 20);
-      setSoundEnabled(settings.soundEnabled !== false);
-      setAnimationsEnabled(settings.animationsEnabled !== false);
-      setBoardSize(settings.boardSize || 'medium');
-    }
-  }, []);
+  const handleChange = (key: string, value: any) => {
+    setSettings({ ...settings, [key]: value });
+    setSaved(false);
+  };
 
-  const handleSaveSettings = () => {
-    const settings = {
-      engineDepth,
-      soundEnabled,
-      animationsEnabled,
-      boardSize
-    };
-    localStorage.setItem('appSettings', JSON.stringify(settings));
-    alert('Settings saved!');
+  const handleSave = () => {
+    localStorage.setItem('chessboardSettings', JSON.stringify(settings));
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleReset = () => {
+    setSettings({
+      engineDepth: 20,
+      boardTheme: 'light',
+      showCoordinates: true,
+      soundEnabled: false,
+      autoAnalyze: true
+    });
   };
 
   return (
     <div className="settings">
       <div className="settings-header">
         <h2>Settings</h2>
-        <p>Configure ChessDaddy to your preferences</p>
       </div>
 
-      <div className="settings-grid">
-        <div className="settings-section">
-          <h3>Appearance</h3>
-
-          <div className="setting-item">
-            <div className="setting-label">
-              <span>Dark Mode</span>
-            </div>
-            <button
-              className={`toggle-btn ${darkMode ? 'active' : ''}`}
-              onClick={() => onDarkModeChange(!darkMode)}
-            >
-              {darkMode ? <Moon size={20} /> : <Sun size={20} />}
-            </button>
-          </div>
-
-          <div className="setting-item">
-            <label htmlFor="boardSize">Board Size</label>
-            <select
-              id="boardSize"
-              value={boardSize}
-              onChange={(e) => setBoardSize(e.target.value)}
-            >
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-            </select>
-          </div>
+      <div className="settings-content">
+        <div className="setting-group">
+          <label htmlFor="engineDepth">Engine Depth</label>
+          <input
+            id="engineDepth"
+            type="range"
+            min="10"
+            max="30"
+            value={settings.engineDepth}
+            onChange={(e) => handleChange('engineDepth', Number(e.target.value))}
+          />
+          <span className="value">{settings.engineDepth}</span>
         </div>
 
-        <div className="settings-section">
-          <h3>Engine</h3>
-
-          <div className="setting-item">
-            <label htmlFor="engineDepth">Analysis Depth</label>
-            <input
-              id="engineDepth"
-              type="range"
-              min="10"
-              max="30"
-              value={engineDepth}
-              onChange={(e) => setEngineDepth(Number(e.target.value))}
-            />
-            <span className="value-display">{engineDepth}</span>
-          </div>
+        <div className="setting-group">
+          <label htmlFor="boardTheme">Board Theme</label>
+          <select
+            id="boardTheme"
+            value={settings.boardTheme}
+            onChange={(e) => handleChange('boardTheme', e.target.value)}
+          >
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="wood">Wood</option>
+          </select>
         </div>
 
-        <div className="settings-section">
-          <h3>Audio & Animations</h3>
-
-          <div className="setting-item">
-            <label htmlFor="sound">Sound Effects</label>
-            <input
-              id="sound"
-              type="checkbox"
-              checked={soundEnabled}
-              onChange={(e) => setSoundEnabled(e.target.checked)}
-            />
-          </div>
-
-          <div className="setting-item">
-            <label htmlFor="animations">Animations</label>
-            <input
-              id="animations"
-              type="checkbox"
-              checked={animationsEnabled}
-              onChange={(e) => setAnimationsEnabled(e.target.checked)}
-            />
-          </div>
+        <div className="setting-group checkbox">
+          <input
+            id="showCoordinates"
+            type="checkbox"
+            checked={settings.showCoordinates}
+            onChange={(e) => handleChange('showCoordinates', e.target.checked)}
+          />
+          <label htmlFor="showCoordinates">Show Board Coordinates</label>
         </div>
+
+        <div className="setting-group checkbox">
+          <input
+            id="soundEnabled"
+            type="checkbox"
+            checked={settings.soundEnabled}
+            onChange={(e) => handleChange('soundEnabled', e.target.checked)}
+          />
+          <label htmlFor="soundEnabled">Enable Sound</label>
+        </div>
+
+        <div className="setting-group checkbox">
+          <input
+            id="autoAnalyze"
+            type="checkbox"
+            checked={settings.autoAnalyze}
+            onChange={(e) => handleChange('autoAnalyze', e.target.checked)}
+          />
+          <label htmlFor="autoAnalyze">Auto-Analyze Positions</label>
+        </div>
+
+        <div className="settings-actions">
+          <button onClick={handleSave} className="btn-primary">
+            <Save size={18} />
+            Save Settings
+          </button>
+          <button onClick={handleReset} className="btn-secondary">
+            <RotateCcw size={18} />
+            Reset to Defaults
+          </button>
+        </div>
+
+        {saved && <div className="save-notification">Settings saved!</div>}
       </div>
-
-      <button className="save-btn" onClick={handleSaveSettings}>
-        <Save size={18} />
-        Save Settings
-      </button>
     </div>
   );
 };

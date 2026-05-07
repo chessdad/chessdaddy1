@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../styles/OpeningExplorer.css';
 import { ChevronDown } from 'lucide-react';
 import { Chess } from 'chess.js';
-import { OpeningBook } from '../services/OpeningBook';
 import Chessboard from './Chessboard';
 
 interface OpeningLine {
@@ -12,45 +11,48 @@ interface OpeningLine {
 }
 
 const OpeningExplorer: React.FC = () => {
-  const [chess] = useState(new Chess());
+  const [chess, setChess] = useState(new Chess());
   const [fen, setFen] = useState(chess.fen());
-  const [openingLines, setOpeningLines] = useState<OpeningLine[]>([]);
-  const [currentLine, setCurrentLine] = useState<string[]>([]);
+  const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const [expandedLines, setExpandedLines] = useState<Set<number>>(new Set());
 
-  useEffect(() => {
-    loadOpeningLines();
-  }, []);
-
-  const loadOpeningLines = () => {
-    const lines = OpeningBook.getOpenings();
-    setOpeningLines(lines);
-  };
+  const openingLines: OpeningLine[] = [
+    { name: 'Italian Game', moves: ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4'], frequency: 45 },
+    { name: 'Ruy Lopez', moves: ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1b5'], frequency: 52 },
+    { name: 'Sicilian Defense', moves: ['e2e4', 'c7c5'], frequency: 78 },
+    { name: 'French Defense', moves: ['e2e4', 'e7e6'], frequency: 34 },
+    { name: 'Caro-Kann Defense', moves: ['e2e4', 'c7c6'], frequency: 42 },
+    { name: 'Queens Gambit', moves: ['d2d4', 'd7d5', 'c2c4'], frequency: 67 }
+  ];
 
   const handleSelectLine = (line: OpeningLine) => {
-    chess.reset();
-    setCurrentLine([]);
-    
+    const newChess = new Chess();
+    const newMoves: string[] = [];
+
     for (const moveStr of line.moves) {
       try {
-        const move = chess.move(moveStr);
+        const move = newChess.move(moveStr);
         if (move) {
-          setCurrentLine([...currentLine, moveStr]);
+          newMoves.push(move.san);
         }
       } catch (e) {
         break;
       }
     }
-    
-    setFen(chess.fen());
+
+    setChess(newChess);
+    setFen(newChess.fen());
+    setMoveHistory(newMoves);
   };
 
   const handleMove = (from: string, to: string) => {
-    const moveObj = chess.move({ from, to });
-    if (moveObj) {
-      const newFen = chess.fen();
-      setFen(newFen);
-      setCurrentLine([...currentLine, moveObj.san]);
+    const newChess = new Chess(fen);
+    const move = newChess.move({ from, to, promotion: 'q' });
+
+    if (move) {
+      setChess(newChess);
+      setFen(newChess.fen());
+      setMoveHistory([...moveHistory, move.san]);
     }
   };
 
@@ -64,6 +66,13 @@ const OpeningExplorer: React.FC = () => {
     setExpandedLines(newExpanded);
   };
 
+  const handleClearBoard = () => {
+    const newChess = new Chess();
+    setChess(newChess);
+    setFen(newChess.fen());
+    setMoveHistory([]);
+  };
+
   return (
     <div className="opening-explorer">
       <div className="explorer-header">
@@ -74,9 +83,14 @@ const OpeningExplorer: React.FC = () => {
       <div className="explorer-content">
         <div className="board-section">
           <Chessboard fen={fen} onMove={handleMove} />
+          <div className="controls">
+            <button onClick={handleClearBoard} className="control-btn">
+              Clear Board
+            </button>
+          </div>
           <div className="move-list">
             <h4>Current Line:</h4>
-            <p>{currentLine.join(' ')}</p>
+            <p>{moveHistory.join(' ')}</p>
           </div>
         </div>
 
@@ -94,7 +108,7 @@ const OpeningExplorer: React.FC = () => {
                     className={expandedLines.has(index) ? 'expanded' : ''}
                   />
                   <span className="line-name">{line.name}</span>
-                  <span className="line-frequency">({line.frequency})</span>
+                  <span className="line-frequency">({line.frequency}%)</span>
                 </div>
                 {expandedLines.has(index) && (
                   <div className="line-details">

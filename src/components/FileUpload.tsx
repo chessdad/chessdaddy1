@@ -1,50 +1,71 @@
-import React, { useRef } from 'react';
-import { Upload } from 'lucide-react';
+import React, { useState } from 'react';
 import '../styles/FileUpload.css';
+import { Upload } from 'lucide-react';
 
 interface FileUploadProps {
   onFileSelect: (content: string) => void;
-  accept?: string;
-  disabled?: boolean;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({
-  onFileSelect,
-  accept = '.pgn,.txt',
-  disabled = false
-}) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect }) => {
+  const [dragActive, setDragActive] = useState(false);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
 
-    try {
-      const content = await file.text();
-      onFileSelect(content);
-    } catch (error) {
-      alert('Failed to read file');
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target?.result as string;
+        onFileSelect(content);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target?.result as string;
+        onFileSelect(content);
+      };
+      reader.readAsText(file);
     }
   };
 
   return (
-    <div className="file-upload">
+    <div
+      className={`file-upload ${dragActive ? 'active' : ''}`}
+      onDragEnter={handleDrag}
+      onDragLeave={handleDrag}
+      onDragOver={handleDrag}
+      onDrop={handleDrop}
+    >
       <input
-        ref={fileInputRef}
         type="file"
-        accept={accept}
-        onChange={handleFileChange}
-        disabled={disabled}
-        style={{ display: 'none' }}
+        id="file-input"
+        accept=".pgn"
+        onChange={handleChange}
+        hidden
       />
-      <button
-        className="upload-btn"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={disabled}
-      >
-        <Upload size={20} />
-        Upload PGN File
-      </button>
+      <label htmlFor="file-input" className="upload-label">
+        <Upload size={32} />
+        <p>Drag and drop PGN file here or click to select</p>
+      </label>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
-import '../styles/EngineEvaluation.css';
 import { Loader } from 'lucide-react';
+import '../styles/EngineEvaluation.css';
 
 interface EngineEvaluationProps {
   evaluation: number | null;
@@ -24,11 +24,11 @@ const EngineEvaluation: React.FC<EngineEvaluationProps> = ({
 
   const getEvaluationColor = (evalScore: number | null): string => {
     if (evalScore === null) return '#888';
-    if (evalScore > 300) return '#4CAF50'; // Green - winning
-    if (evalScore > 100) return '#8BC34A'; // Light green - better
-    if (evalScore < -300) return '#F44336'; // Red - losing
-    if (evalScore < -100) return '#FF9800'; // Orange - worse
-    return '#FFC107'; // Yellow - roughly equal
+    if (evalScore > 300) return '#4CAF50';
+    if (evalScore > 100) return '#8BC34A';
+    if (evalScore < -300) return '#F44336';
+    if (evalScore < -100) return '#FF9800';
+    return '#FFC107';
   };
 
   return (
