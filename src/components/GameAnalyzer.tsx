@@ -25,7 +25,7 @@ interface GameAnalysisResult {
   blunderCount: number;
 }
 
-const GameAnalyzer: React.FC = () => {
+const GameAnalyzerComponent: React.FC = () => {
   const [username, setUsername] = useState('');
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
@@ -214,4 +214,4 @@ const GameAnalyzer: React.FC = () => {
   );
 };
 
-export default GameAnalyzer;
+export default GameAnalyzerComponent;
