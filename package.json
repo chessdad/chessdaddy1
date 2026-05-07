@@ -2,7 +2,7 @@
   "name": "chessdaddy",
   "version": "1.0.0",
   "description": "Stockfish-powered chess analysis desktop application",
-  "main": "dist/main.js",
+  "main": "public/electron.js",
   "homepage": "./",
   "author": "typp3212",
   "license": "MIT",
@@ -13,27 +13,24 @@
     "react-eject": "react-scripts eject",
     "electron-start": "wait-on http://localhost:3000 && electron .",
     "electron-dev": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "start": "npm run electron-dev",
     "electron-build": "npm run react-build && electron-builder",
     "build": "npm run react-build && electron-builder",
     "build-exe": "npm run react-build && electron-builder --win --publish never",
-    "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && electron .\""
+    "dist": "npm run build-exe"
   },
   "dependencies": {
     "axios": "^1.6.2",
     "chess.js": "^1.0.0-beta.7",
-    "chessground": "^9.1.0",
+    "electron-is-dev": "^2.0.0",
     "electron-squirrel-startup": "^1.1.1",
+    "electron-store": "^8.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "stockfish": "^16.1.0"
+    "react-scripts": "5.0.1"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.5",
-    "@electron-forge/maker-squirrel": "^6.0.5",
-    "@electron-forge/maker-zip": "^6.0.5",
-    "@electron-forge/maker-deb": "^6.0.5",
-    "@electron-forge/maker-rpm": "^6.0.5",
+    "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "concurrently": "^7.6.0",
@@ -54,23 +51,34 @@
       "last 1 safari version"
     ]
   },
+  "homepage": "./",
+  "main": "public/electron.js",
   "build": {
     "appId": "com.chessdaddy.app",
     "productName": "ChessDaddy",
     "files": [
-      "dist/",
-      "build/",
-      "node_modules/",
-      "public/",
-      "package.json"
+      "build/**/*",
+      "node_modules/**/*",
+      "public/electron.js",
+      "public/preload.js"
     ],
     "directories": {
       "buildResources": "public"
     },
     "win": {
       "target": [
-        "nsis",
-        "portable"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "certificateFile": null,
       "certificatePassword": null,

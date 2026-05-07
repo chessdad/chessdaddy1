@@ -1,247 +1,375 @@
-# ChessDaddy - Stockfish-Powered Chess Analysis Desktop App
+# ChessDaddy - Complete Chess Analysis Application
 
-A modern desktop application for chess analysis powered by Stockfish 18, featuring real-time game analysis, puzzle generation, and Chess.com integration.
+## ✨ Features
 
-## Features
+### Core Features
+- **Stockfish 18 Integration** - Local, offline chess engine analysis
+- **Interactive Analysis Board** - Full-featured chessboard with animations
+- **PGN Support** - Import and analyze complete games
+- **Chess.com Integration** - Fetch and analyze your public games
+- **Move Classification** - Brilliant, Great, Best, Good, Inaccuracy, Mistake, Blunder
+- **Puzzle System** - Infinite puzzles with dynamic difficulty scaling
+- **Opening Explorer** - Master game statistics for positions
+- **Dark Mode** - Complete dark theme support
+- **Fully Offline** - Works completely without internet after setup
 
-✨ **Core Features**
-- Local Stockfish 18 engine integration (no cloud processing)
-- Real-time position analysis with configurable depth
-- Interactive chessboard with smooth animations
-- Chess.com game fetching and analysis
-- Infinite puzzle mode with dynamic difficulty scaling
-- Opening explorer with master game statistics
-- Move classification system (Brilliant, Great, Best, Good, Inaccuracy, Mistake, Blunder)
-- Dark mode support
-- Complete offline functionality after installation
+---
 
-## System Requirements
+## 📋 System Requirements
 
-- Windows 10 or later (64-bit)
-- 2GB RAM minimum
-- 500MB disk space
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| OS | Windows 10 64-bit | Windows 10/11 64-bit |
+| RAM | 2GB | 4GB+ |
+| Storage | 500MB | 1GB |
+| CPU | Intel i5 | Intel i7+ |
 
-## Installation
+---
 
-### Option 1: Download Pre-built Executable (Easiest)
+## 🚀 Quick Start (5 Minutes)
 
-1. Visit the [Releases](https://github.com/typp3212/chessdaddy/releases) page
-2. Download the latest `ChessDaddy.exe`
-3. Run the installer
-4. Launch ChessDaddy from your Start Menu or Desktop shortcut
+### For Non-Technical Users
 
-### Option 2: Build from Source
+1. **Download & Install**
+   - Go to [Releases](https://github.com/typp3212/chessdaddy/releases)
+   - Download `ChessDaddy.exe`
+   - Run the installer
+   - Launch from Start Menu
 
-#### Prerequisites
-- Node.js (v16 or later) - Download from [nodejs.org](https://nodejs.org)
-- Git - Download from [git-scm.com](https://git-scm.com)
+**Done!** Everything is included.
 
-#### Steps
+### For Developers/Building from Source
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/typp3212/chessdaddy.git
-   cd chessdaddy
-   ```
+See [INSTALLATION.md](./INSTALLATION.md) and [SETUP.md](./SETUP.md) for detailed instructions.
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+---
 
-3. **Download Stockfish 18**
-   - Download from [stockfishchess.org](https://stockfishchess.org/download/)
-   - Extract and place `stockfish.exe` in `./engines/` folder
-   - Create the engines folder if it doesn't exist:
-     ```bash
-     mkdir engines
-     ```
-
-4. **Run in development mode**
-   ```bash
-   npm start
-   ```
-
-5. **Build executable**
-   ```bash
-   npm run build-exe
-   ```
-   The `.exe` file will be in the `dist/` folder
-
-## Usage
+## 🎮 How to Use
 
 ### Analysis Board
-- Import PGN files or enter FEN positions
-- Real-time Stockfish analysis
-- View best moves and evaluations
-- Interactive move history
+1. Click "Analysis" in the sidebar
+2. Click squares to move pieces
+3. Engine automatically analyzes positions
+4. Adjust analysis depth in settings
+5. Import PGN files or paste FEN positions
 
-### My Games
-- Enter your Chess.com username
-- Automatically fetches your public games
-- Analyze accuracy, move classifications, and statistics
-- Review detailed game analysis
+### Chess.com Games
+1. Click "My Games"
+2. Enter your Chess.com username
+3. Click "Fetch Games"
+4. Select a game to analyze
+5. View accuracy, move classifications, and statistics
 
 ### Puzzle Mode
-- Infinite puzzle stream
-- Dynamic difficulty scaling based on performance
-- Puzzle rating display
-- Streak tracking
+1. Click "Puzzles"
+2. Solve tactical puzzles
+3. Difficulty scales based on your rating
+4. Track your streak and accuracy
+5. Puzzles include: Mate, Fork, Pin, Sacrifice, Defense
 
 ### Opening Explorer
-- Explore openings with master game statistics
-- Win/draw/loss rates for each position
-- Navigate through move sequences
+1. Click "Openings"
+2. Move pieces to explore opening statistics
+3. See win rates from master games
+4. Navigate through variations
+5. Reset or undo to try different lines
 
 ### Settings
-- Dark mode toggle
-- Engine analysis depth configuration
-- Sound effects and animation toggles
-- Board size customization
+1. Click "Settings"
+2. Toggle dark mode
+3. Adjust engine analysis depth (10-30)
+4. Configure board size
+5. Enable/disable sound and animations
 
-## Project Structure
+---
+
+## 🏗️ Project Structure
 
 ```
 chessdaddy/
 ├── public/
-│   ├── index.html
-│   ├── electron.js           # Main Electron process
-│   └── preload.js            # Preload script for IPC
+│   ├── electron.js              # Electron main process
+│   ├── preload.js               # IPC bridge
+│   ├── index.html               # HTML template
+│   └── manifest.json            # PWA manifest
 ├── src/
 │   ├── components/
-│   │   ├── AnalysisBoard.tsx
-│   │   ├── Chessboard.tsx
-│   │   ├── GameAnalyzer.tsx
-│   │   ├── PuzzleMode.tsx
-│   │   ├── OpeningExplorer.tsx
-│   │   └── Settings.tsx
+│   │   ├── AnalysisBoard.tsx    # Main analysis interface
+│   │   ├── Chessboard.tsx       # Playable board
+│   │   ├── GameAnalyzer.tsx     # Chess.com integration
+│   │   ├── PuzzleMode.tsx       # Puzzle system
+│   │   ├── OpeningExplorer.tsx  # Opening statistics
+│   │   ├── Settings.tsx         # User preferences
+│   │   ├── Sidebar.tsx          # Navigation
+│   │   └── ...
 │   ├── services/
-│   │   ├── ChessEngine.ts    # Stockfish integration
-│   │   ├── ChessComAPI.ts    # Chess.com API wrapper
-│   │   ├── PuzzleGenerator.ts
-│   │   └── MoveClassifier.ts
-│   ├── styles/               # CSS modules
-│   ├── App.tsx
-│   └── index.tsx
-├── package.json
-├── tsconfig.json
-└── README.md
+│   │   ├── StockfishWorker.ts   # Engine communication
+│   │   ├── ChessComAPI.ts       # Chess.com API
+│   │   ├── GameAnalyzer.ts      # Game analysis logic
+│   │   ├── PuzzleSystem.ts      # Puzzle generation
+│   │   ├── MoveClassifier.ts    # Move classification
+│   │   ├── PGNParser.ts         # PGN parsing
+│   │   ├── OpeningBook.ts       # Opening statistics
+│   │   └── ...
+│   ├── styles/
+│   │   ├── index.css            # Global styles
+│   │   ├── App.css              # App layout
+│   │   └── *.css                # Component styles
+│   ├── App.tsx                  # Main app component
+│   └── index.tsx                # React entry point
+├── engines/
+│   └── stockfish.exe            # Chess engine (download separately)
+├── package.json                 # Dependencies
+├── tsconfig.json                # TypeScript config
+├── README.md                    # This file
+├── INSTALLATION.md              # Setup instructions
+├── SETUP.md                     # Beginner guide
+└── .gitignore
 ```
 
-## Configuration
+---
 
-Settings are stored locally in `~/.config/chessdaddy/` on Windows.
+## 🛠️ Development
 
-### Customizable Settings
-- **Engine Depth**: 10-30 (default: 20)
-- **Board Size**: Small, Medium, Large
-- **Dark Mode**: On/Off
-- **Sound Effects**: On/Off
-- **Animations**: On/Off
+### Prerequisites
+- Node.js 16+ ([Download](https://nodejs.org))
+- Git ([Download](https://git-scm.com))
+- Stockfish 18 ([Download](https://stockfishchess.org/download/))
 
-## Development
+### Setup
+
+```bash
+# Clone repository
+git clone https://github.com/typp3212/chessdaddy.git
+cd chessdaddy
+
+# Install dependencies
+npm install
+
+# Add Stockfish
+# 1. Download from stockfishchess.org
+# 2. Extract stockfish.exe
+# 3. Create engines/ folder
+# 4. Copy stockfish.exe to engines/
+
+# Start development
+npm start
+
+# Build for Windows
+npm run build-exe
+```
 
 ### Available Scripts
 
 ```bash
-# Start development server
-npm start
-
-# Build React app
-npm run react-build
-
-# Build Electron app
-npm run electron-build
-
-# Create Windows executable
-npm run build-exe
-
-# Run tests
-npm test
+npm start              # Start dev server + Electron
+npm run react-start    # React only (port 3000)
+npm run react-build    # Build React app
+npm run build-exe      # Create Windows .EXE
+npm run electron-build # Build Electron app
 ```
-
-### Adding New Features
-
-1. Create components in `src/components/`
-2. Create services in `src/services/`
-3. Import and use in main App component
-4. Style with CSS files in `src/styles/`
-
-## API Integration
-
-### Chess.com API
-- No authentication required for public games
-- Endpoints used:
-  - `/pub/player/{username}/games`
-  - `/pub/player/{username}/stats`
-  - `/pub/player/{username}`
-
-### Stockfish Engine
-- Local binary integration via UCI protocol
-- No external API calls
-- Full offline support
-
-## Troubleshooting
-
-### "Stockfish not found" error
-- Ensure `stockfish.exe` is in the `./engines/` folder
-- Download from [stockfishchess.org](https://stockfishchess.org/download/)
-
-### Application won't start
-- Delete `node_modules/` and `package-lock.json`
-- Run `npm install` again
-- Clear cache: `npm cache clean --force`
-
-### Chess.com username not found
-- Verify the username is spelled correctly
-- Ensure the account has public games
-- Check your internet connection
-
-## Performance Optimization
-
-- Analysis depth limited to 30 for responsiveness
-- Puzzle generation cached locally
-- Minimal re-renders with React hooks
-- Efficient board representation
-
-## Future Features
-
-- [ ] Lichess.org integration
-- [ ] PGN file import/export
-- [ ] Opening repertoire builder
-- [ ] Endgame tablebase support
-- [ ] Online multiplayer
-- [ ] Mobile companion app
-- [ ] Machine learning move suggestions
-
-## License
-
-MIT License - See LICENSE file for details
-
-## Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## Support
-
-For issues and questions:
-- Open an issue on [GitHub Issues](https://github.com/typp3212/chessdaddy/issues)
-- Check existing issues for solutions
-
-## Credits
-
-- **Stockfish**: [stockfishchess.org](https://stockfishchess.org)
-- **Chess.js**: Chess game validation library
-- **Electron**: Desktop application framework
-- **React**: UI framework
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-05-07  
-**Maintainer**: typp3212
+## 📊 Move Classification System
+
+Similar to Chess.com's analysis:
+
+| Classification | Criteria |
+|---|---|
+| **Brilliant** | Surprising move with tactical advantage (often sacrifice) |
+| **Great** | Excellent move, close to best |
+| **Best** | Matches engine recommendation |
+| **Good** | Solid move, close to best |
+| **Inaccuracy** | Minor mistake (50-200 cp loss) |
+| **Mistake** | Significant error (200-500 cp loss) |
+| **Blunder** | Major blunder (500+ cp loss) |
+
+---
+
+## 🧩 Puzzle System
+
+### Difficulty Scaling
+- Start: 500-800 rating
+- Progress: Difficulty increases with success
+- Rating ranges: 500-3000 ELO
+- Based on Lichess puzzle mechanics
+
+### Themes
+- **Mate** - Mating combinations
+- **Fork** - Winning multiple pieces
+- **Pin** - Exploiting pinned pieces
+- **Skewer** - Reverse pin tactics
+- **Sacrifice** - Material sacrifice for advantage
+- **Defense** - Defensive tactics
+
+---
+
+## 🌐 API Integration
+
+### Chess.com
+- **No authentication required** - Uses public API
+- **Endpoints**: `/pub/player/{username}/games`
+- **Offline fallback**: No internet needed for other features
+
+### Lichess Opening Book
+- **Master game statistics**
+- **Win/draw/loss rates**
+- **Popularity metrics**
+- **Cached locally** for performance
+
+---
+
+## 💾 Local Storage
+
+All data stored locally in `~/.config/chessdaddy/`:
+- Puzzle progress and ratings
+- User preferences and settings
+- Chess.com username
+- Analysis history
+- Game annotations
+
+---
+
+## ⚙️ Configuration
+
+### Engine Settings
+Edit `src/services/StockfishWorker.ts`:
+```typescript
+threads: 4              // CPU threads to use
+hash: 256               // Hash table in MB
+multiPV: 1              // Number of variations
+analysisDepth: 20       // Default analysis depth
+```
+
+### Board Appearance
+Edit `src/styles/Chessboard.css`:
+```css
+/* Light square color */
+.square.light { background-color: #F0D9B5; }
+/* Dark square color */
+.square.dark { background-color: #B58863; }
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### "Stockfish not found"
+```bash
+# Verify stockfish.exe exists
+dir engines
+
+# Should show: stockfish.exe
+```
+
+### "Module not found" errors
+```bash
+rm -r node_modules
+npm cache clean --force
+npm install
+```
+
+### App won't start
+```bash
+# Check terminal for errors
+# Kill any stuck processes
+taskkill /F /IM node.exe
+taskkill /F /IM electron.exe
+
+# Clear cache and restart
+npm cache clean --force
+npm start
+```
+
+### Chess.com games not loading
+- Verify username spelling
+- Ensure account has public games
+- Check internet connection
+- Wait 30 seconds for API response
+
+---
+
+## 📈 Performance
+
+- **Engine depth**: Limited to 30 for responsiveness
+- **Board rendering**: 60 FPS animations
+- **Analysis**: Real-time as you play
+- **Puzzle generation**: Cached locally
+- **Memory usage**: ~200-400 MB
+
+---
+
+## 🔒 Privacy & Security
+
+- **No cloud processing** - Everything runs locally
+- **No data collection** - Your games stay private
+- **Open source** - Audit the code anytime
+- **Sandboxed** - Electron isolation enabled
+
+---
+
+## 🚀 Future Features
+
+- [ ] Lichess.org integration
+- [ ] PGN export with annotations
+- [ ] Opening repertoire builder
+- [ ] Endgame tablebase support
+- [ ] Machine learning suggestions
+- [ ] Online multiplayer
+- [ ] Mobile companion app
+- [ ] Custom engine support
+
+---
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit changes: `git commit -am 'Add new feature'`
+4. Push to branch: `git push origin feature/my-feature`
+5. Open a Pull Request
+
+---
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/typp3212/chessdaddy/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/typp3212/chessdaddy/discussions)
+- **Email**: Contact through GitHub
+
+---
+
+## 🙏 Credits
+
+- **Stockfish**: [stockfishchess.org](https://stockfishchess.org) - Powerful chess engine
+- **Chess.js**: Chess game validation and PGN parsing
+- **Electron**: Desktop application framework
+- **React**: UI framework
+- **Lichess**: Opening book data and puzzle concepts
+
+---
+
+## 📝 Version History
+
+### v1.0.0 (2026-05-07)
+- Initial release
+- Stockfish 18 integration
+- Chess.com game analyzer
+- Puzzle system with rating progression
+- Opening explorer
+- Dark mode support
+- Complete offline functionality
+
+---
+
+**Made with ♥ by typp3212**
+
+GitHub: [@typp3212](https://github.com/typp3212)  
+Repository: [typp3212/chessdaddy](https://github.com/typp3212/chessdaddy)

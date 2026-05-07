@@ -1,10 +1,9 @@
-const { app, BrowserWindow, ipcMain, Menu } = require('electron');
-const path = require('path');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const isDev = require('electron-is-dev');
+const path = require('path');
 const Store = require('electron-store');
 
 const store = new Store();
-
 let mainWindow;
 
 function createWindow() {
@@ -17,9 +16,12 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      enableRemoteModule: false
+      enableRemoteModule: false,
+      sandbox: true
     },
-    icon: path.join(__dirname, 'assets/icon.png')
+    icon: isDev
+      ? path.join(__dirname, 'public/chess-icon.png')
+      : path.join(__dirname, 'build/chess-icon.png')
   });
 
   const startUrl = isDev
@@ -35,9 +37,13 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  return mainWindow;
 }
 
-app.on('ready', createWindow);
+app.on('ready', () => {
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -51,15 +57,25 @@ app.on('activate', () => {
   }
 });
 
-// IPC Handlers
-ipcMain.handle('get-store', (event, key) => {
+// IPC Handlers for electron storage
+ipcMain.handle('store-get', (event, key) => {
   return store.get(key);
 });
 
-ipcMain.handle('set-store', (event, key, value) => {
+ipcMain.handle('store-set', (event, key, value) => {
   store.set(key, value);
+  return true;
 });
 
-ipcMain.handle('delete-store', (event, key) => {
+ipcMain.handle('store-delete', (event, key) => {
   store.delete(key);
+  return true;
+});
+
+ipcMain.handle('get-app-path', () => {
+  return app.getAppPath();
+});
+
+ipcMain.handle('get-user-data-path', () => {
+  return app.getPath('userData');
 });
