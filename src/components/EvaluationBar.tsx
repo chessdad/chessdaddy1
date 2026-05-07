@@ -10,11 +10,11 @@ const EvaluationBar: React.FC<EvaluationBarProps> = ({ whiteEval, blackEval }) =
   const total = Math.abs(whiteEval) + Math.abs(blackEval);
   const whitePercentage = total === 0 ? 50 : (Math.abs(whiteEval) / total) * 100;
 
-  const formatEval = (eval: number): string => {
-    if (Math.abs(eval) > 10000) {
-      return eval > 0 ? '+M' : '-M';
+  const formatEval = (evalScore: number): string => {
+    if (Math.abs(evalScore) > 10000) {
+      return evalScore > 0 ? '+M' : '-M';
     }
-    return (eval / 100).toFixed(2);
+    return (evalScore / 100).toFixed(2);
   };
 
   return (
