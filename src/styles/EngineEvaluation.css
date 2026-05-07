@@ -1,76 +1,69 @@
 .engine-evaluation {
   padding: 20px;
+  background-color: #2a2a2a;
+  border-radius: 8px;
 }
 
 .evaluation-card {
-  background-color: var(--light-surface);
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-html.dark-mode .evaluation-card {
-  background-color: var(--dark-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .evaluation-card h3 {
-  margin-bottom: 16px;
-  color: var(--primary-color);
+  margin: 0;
   font-size: 16px;
-  font-weight: 600;
 }
 
 .evaluation-display {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.spinner {
-  animation: spin 1s linear infinite;
-  color: var(--primary-color);
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  gap: 10px;
+  min-height: 60px;
 }
 
 .eval-value {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 60px;
 }
 
 .eval-number {
   font-size: 36px;
-  font-weight: 700;
-  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-family: monospace;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .best-move {
-  background-color: rgba(33, 150, 243, 0.1);
-  padding: 12px;
-  border-radius: 6px;
-  border-left: 4px solid var(--primary-color);
+  padding: 10px;
+  background-color: #3a3a3a;
+  border-radius: 4px;
+  text-align: center;
 }
 
 .best-move-label {
+  margin: 0 0 5px 0;
   font-size: 12px;
   color: #999;
-  margin-bottom: 4px;
 }
 
 .best-move-value {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--primary-color);
-  font-family: 'Courier New', monospace;
+  margin: 0;
+  font-size: 18px;
+  font-family: monospace;
+  font-weight: bold;
 }

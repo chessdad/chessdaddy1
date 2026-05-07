@@ -1,24 +1,21 @@
 .fen-input-section {
-  background-color: var(--light-surface);
-  padding: 16px;
+  padding: 20px;
+  background-color: #2a2a2a;
   border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-html.dark-mode .fen-input-section {
-  background-color: var(--dark-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .fen-input-group {
-  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .fen-input-group label {
-  display: block;
-  margin-bottom: 8px;
+  font-size: 14px;
   font-weight: 500;
-  font-size: 13px;
-  color: var(--primary-color);
 }
 
 .fen-input-wrapper {
@@ -28,67 +25,59 @@ html.dark-mode .fen-input-section {
 
 .fen-input-wrapper input {
   flex: 1;
-  padding: 10px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  padding: 8px 12px;
+  background-color: #3a3a3a;
+  border: 1px solid #333;
+  color: #fff;
+  border-radius: 4px;
+  font-family: monospace;
   font-size: 12px;
-  font-family: 'Courier New', monospace;
 }
 
-html.dark-mode .fen-input-wrapper input {
-  background-color: var(--dark-bg);
-  color: var(--dark-text);
-  border-color: var(--dark-border);
+.fen-input-wrapper input:focus {
+  outline: none;
+  border-color: #4CAF50;
 }
 
 .copy-btn {
   padding: 8px 12px;
-  background-color: var(--primary-color);
+  background-color: #4CAF50;
   color: white;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .copy-btn:hover {
-  background-color: var(--secondary-color);
+  background-color: #45a049;
 }
 
 .fen-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .action-btn {
   flex: 1;
-  padding: 10px 12px;
-  background-color: var(--light-surface);
-  color: var(--light-text);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-html.dark-mode .action-btn {
-  background-color: var(--dark-bg);
-  color: var(--dark-text);
-  border-color: var(--dark-border);
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .action-btn:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
+  background-color: #45a049;
 }
 
 .action-btn.danger {
-  color: #F44336;
+  background-color: #f44336;
 }
 
 .action-btn.danger:hover {
-  border-color: #F44336;
-  background-color: rgba(244, 67, 54, 0.1);
+  background-color: #da190b;
 }

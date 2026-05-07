@@ -1,50 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import './styles/App.css';
+import React, { useState } from 'react';
+import './App.css';
 import Sidebar from './components/Sidebar';
 import AnalysisBoard from './components/AnalysisBoard';
 import GameAnalyzer from './components/GameAnalyzer';
-import PuzzleMode from './components/PuzzleMode';
 import OpeningExplorer from './components/OpeningExplorer';
+import PuzzleMode from './components/PuzzleMode';
 import Settings from './components/Settings';
 
-type Page = 'analysis' | 'games' | 'puzzles' | 'openings' | 'settings';
+type ViewType = 'analysis' | 'games' | 'openings' | 'puzzles' | 'settings';
 
-const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<Page>('analysis');
-  const [darkMode, setDarkMode] = useState(false);
+function App() {
+  const [currentView, setCurrentView] = useState<ViewType>('analysis');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  useEffect(() => {
-    // Load dark mode preference from storage
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode) {
-      setDarkMode(JSON.parse(savedDarkMode));
+  const renderView = () => {
+    switch (currentView) {
+      case 'analysis':
+        return <AnalysisBoard />;
+      case 'games':
+        return <GameAnalyzer />;
+      case 'openings':
+        return <OpeningExplorer />;
+      case 'puzzles':
+        return <PuzzleMode />;
+      case 'settings':
+        return <Settings />;
+      default:
+        return <AnalysisBoard />;
     }
-  }, []);
-
-  useEffect(() => {
-    // Apply dark mode class to document
-    if (darkMode) {
-      document.documentElement.classList.add('dark-mode');
-    } else {
-      document.documentElement.classList.remove('dark-mode');
-    }
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
-  }, [darkMode]);
+  };
 
   return (
-    <div className="app-container">
-      <Sidebar currentPage={currentPage} onPageChange={setCurrentPage} />
-      <main className="main-content">
-        {currentPage === 'analysis' && <AnalysisBoard />}
-        {currentPage === 'games' && <GameAnalyzer />}
-        {currentPage === 'puzzles' && <PuzzleMode />}
-        {currentPage === 'openings' && <OpeningExplorer />}
-        {currentPage === 'settings' && (
-          <Settings darkMode={darkMode} onDarkModeChange={setDarkMode} />
-        )}
+    <div className="app">
+      <Sidebar
+        currentView={currentView}
+        onViewChange={setCurrentView}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+      />
+      <main className={`main-content ${sidebarOpen ? '' : 'sidebar-closed'}`}>
+        {renderView()}
       </main>
     </div>
   );
-};
+}
 
 export default App;

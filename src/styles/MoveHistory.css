@@ -1,42 +1,30 @@
 .move-history {
   padding: 20px;
-  background-color: var(--light-surface);
+  background-color: #2a2a2a;
   border-radius: 8px;
-  margin-top: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-html.dark-mode .move-history {
-  background-color: var(--dark-surface);
 }
 
 .move-history h3 {
-  margin-bottom: 12px;
-  color: var(--primary-color);
+  margin: 0 0 15px 0;
   font-size: 16px;
-  font-weight: 600;
 }
 
-.moves-list {
+.moves-container {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  max-height: 200px;
-  overflow-y: auto;
 }
 
-.move-item {
-  background-color: var(--primary-color);
-  color: white;
+.move {
   padding: 6px 12px;
+  background-color: #3a3a3a;
   border-radius: 4px;
+  font-family: monospace;
   font-size: 13px;
-  font-weight: 500;
-  font-family: 'Courier New', monospace;
 }
 
-.empty-state {
+.no-moves {
   color: #999;
-  font-size: 14px;
   margin: 0;
+  font-size: 14px;
 }

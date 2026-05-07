@@ -1,27 +1,16 @@
-.app-container {
+.app {
   display: flex;
-  width: 100vw;
   height: 100vh;
-  background-color: var(--light-bg);
-}
-
-html.dark-mode .app-container {
-  background-color: var(--dark-bg);
+  background-color: #1a1a1a;
 }
 
 .main-content {
   flex: 1;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
+  overflow-y: auto;
+  background-color: #0d0d0d;
+  padding: 20px;
 }
 
-@media (max-width: 768px) {
-  .app-container {
-    flex-direction: column;
-  }
-
-  .main-content {
-    height: calc(100vh - 60px);
-  }
+.main-content.sidebar-closed {
+  width: 100%;
 }
