@@ -1,375 +1,101 @@
-# ChessDaddy - Complete Chess Analysis Application
+# ChessDaddy
 
-## ✨ Features
+ChessDaddy is a Stockfish-powered chess analysis desktop application built with React and Electron. This repository contains the UI, services, and mock engine integration for local development.
 
-### Core Features
-- **Stockfish 18 Integration** - Local, offline chess engine analysis
-- **Interactive Analysis Board** - Full-featured chessboard with animations
-- **PGN Support** - Import and analyze complete games
-- **Chess.com Integration** - Fetch and analyze your public games
-- **Move Classification** - Brilliant, Great, Best, Good, Inaccuracy, Mistake, Blunder
-- **Puzzle System** - Infinite puzzles with dynamic difficulty scaling
-- **Opening Explorer** - Master game statistics for positions
-- **Dark Mode** - Complete dark theme support
-- **Fully Offline** - Works completely without internet after setup
+> Note: The repository currently uses a mock Stockfish worker implementation (src/services/StockfishWorker.ts) for development. Replace it with a real Stockfish WebAssembly worker or native engine if you need accurate engine evaluations.
 
----
+## Quick start (development)
 
-## 📋 System Requirements
+1. Clone the repository and change into it:
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| OS | Windows 10 64-bit | Windows 10/11 64-bit |
-| RAM | 2GB | 4GB+ |
-| Storage | 500MB | 1GB |
-| CPU | Intel i5 | Intel i7+ |
+   ```bash
+   git clone https://github.com/chessdad/chessdaddy1.git
+   cd chessdaddy1
+   ```
 
----
+2. Install dependencies (use legacy peer deps to avoid react-scripts / TypeScript peer conflicts):
 
-## 🚀 Quick Start (5 Minutes)
+   ```bash
+   npm install --legacy-peer-deps
+   ```
 
-### For Non-Technical Users
+3. Start the React development server only (recommended for faster iteration):
 
-1. **Download & Install**
-   - Go to [Releases](https://github.com/typp3212/chessdaddy/releases)
-   - Download `ChessDaddy.exe`
-   - Run the installer
-   - Launch from Start Menu
+   ```bash
+   npm run react-start
+   ```
 
-**Done!** Everything is included.
+   - Open http://localhost:3000 in your browser to view the app.
 
-### For Developers/Building from Source
+4. To run the full Electron + React dev environment (requires electron installed):
 
-See [INSTALLATION.md](./INSTALLATION.md) and [SETUP.md](./SETUP.md) for detailed instructions.
+   ```bash
+   npm start
+   ```
 
----
+   This runs the React dev server and launches Electron when the server is ready.
 
-## 🎮 How to Use
+## Build / Distribution
 
-### Analysis Board
-1. Click "Analysis" in the sidebar
-2. Click squares to move pieces
-3. Engine automatically analyzes positions
-4. Adjust analysis depth in settings
-5. Import PGN files or paste FEN positions
-
-### Chess.com Games
-1. Click "My Games"
-2. Enter your Chess.com username
-3. Click "Fetch Games"
-4. Select a game to analyze
-5. View accuracy, move classifications, and statistics
-
-### Puzzle Mode
-1. Click "Puzzles"
-2. Solve tactical puzzles
-3. Difficulty scales based on your rating
-4. Track your streak and accuracy
-5. Puzzles include: Mate, Fork, Pin, Sacrifice, Defense
-
-### Opening Explorer
-1. Click "Openings"
-2. Move pieces to explore opening statistics
-3. See win rates from master games
-4. Navigate through variations
-5. Reset or undo to try different lines
-
-### Settings
-1. Click "Settings"
-2. Toggle dark mode
-3. Adjust engine analysis depth (10-30)
-4. Configure board size
-5. Enable/disable sound and animations
-
----
-
-## 🏗️ Project Structure
-
-```
-chessdaddy/
-├── public/
-│   ├── electron.js              # Electron main process
-│   ├── preload.js               # IPC bridge
-│   ├── index.html               # HTML template
-│   └── manifest.json            # PWA manifest
-├── src/
-│   ├── components/
-│   │   ├── AnalysisBoard.tsx    # Main analysis interface
-│   │   ├── Chessboard.tsx       # Playable board
-│   │   ├── GameAnalyzer.tsx     # Chess.com integration
-│   │   ├── PuzzleMode.tsx       # Puzzle system
-│   │   ├── OpeningExplorer.tsx  # Opening statistics
-│   │   ├── Settings.tsx         # User preferences
-│   │   ├── Sidebar.tsx          # Navigation
-│   │   └── ...
-│   ├── services/
-│   │   ├── StockfishWorker.ts   # Engine communication
-│   │   ├── ChessComAPI.ts       # Chess.com API
-│   │   ├── GameAnalyzer.ts      # Game analysis logic
-│   │   ├── PuzzleSystem.ts      # Puzzle generation
-│   │   ├── MoveClassifier.ts    # Move classification
-│   │   ├── PGNParser.ts         # PGN parsing
-│   │   ├── OpeningBook.ts       # Opening statistics
-│   │   └── ...
-│   ├── styles/
-│   │   ├── index.css            # Global styles
-│   │   ├── App.css              # App layout
-│   │   └── *.css                # Component styles
-│   ├── App.tsx                  # Main app component
-│   └── index.tsx                # React entry point
-├── engines/
-│   └── stockfish.exe            # Chess engine (download separately)
-├── package.json                 # Dependencies
-├── tsconfig.json                # TypeScript config
-├── README.md                    # This file
-├── INSTALLATION.md              # Setup instructions
-├── SETUP.md                     # Beginner guide
-└── .gitignore
-```
-
----
-
-## 🛠️ Development
-
-### Prerequisites
-- Node.js 16+ ([Download](https://nodejs.org))
-- Git ([Download](https://git-scm.com))
-- Stockfish 18 ([Download](https://stockfishchess.org/download/))
-
-### Setup
+To build a packaged application (uses `electron-builder`):
 
 ```bash
-# Clone repository
-git clone https://github.com/typp3212/chessdaddy.git
-cd chessdaddy
-
-# Install dependencies
-npm install
-
-# Add Stockfish
-# 1. Download from stockfishchess.org
-# 2. Extract stockfish.exe
-# 3. Create engines/ folder
-# 4. Copy stockfish.exe to engines/
-
-# Start development
-npm start
-
-# Build for Windows
-npm run build-exe
+npm run build
+# or
+npm run electron-build
 ```
 
-### Available Scripts
+Note: Building a packaged app requires native dependencies (Electron) and may need additional configuration for code signing on Windows/macOS.
 
-```bash
-npm start              # Start dev server + Electron
-npm run react-start    # React only (port 3000)
-npm run react-build    # Build React app
-npm run build-exe      # Create Windows .EXE
-npm run electron-build # Build Electron app
-```
+## What I changed / current status
 
----
+- Fixed multiple TypeScript and runtime issues related to the chess.js API compatibility (migrated to the v1 beta API such as `loadPgn()` and removed unsupported `sloppy` options).
+- Resolved duplicate identifier issues and reserved-word usage (`eval` → `evalScore`).
+- Added missing UI components and CSS files to provide working views for Analysis, Openings, Puzzles, Settings, and Game Analyzer.
+- Added a mock Stockfish worker implementation at `src/services/StockfishWorker.ts` for local dev. This returns deterministic placeholder evaluations and best-move strings — replace with a real engine for production-quality analysis.
 
-## 📊 Move Classification System
+## Services (files of interest)
 
-Similar to Chess.com's analysis:
+- `src/services/StockfishWorker.ts` — mock engine that simulates evaluation and best-move. Replace with real Stockfish WebAssembly worker for accurate analysis.
+- `src/services/ChessComAPI.ts` — fetches game archives and latest month's games from Chess.com public API.
+- `src/services/PGNParser.ts` — PGN parsing and move extraction using `chess.js`.
+- `src/services/GameAnalyzer.ts` — simple analysis orchestration (currently simulated).
+- `src/services/OpeningBook.ts` — opening lines / book (static in repo).
+- `src/services/PuzzleGenerator.ts` and `src/services/PuzzleSystem.ts` — puzzle helpers and generator (basic).
 
-| Classification | Criteria |
-|---|---|
-| **Brilliant** | Surprising move with tactical advantage (often sacrifice) |
-| **Great** | Excellent move, close to best |
-| **Best** | Matches engine recommendation |
-| **Good** | Solid move, close to best |
-| **Inaccuracy** | Minor mistake (50-200 cp loss) |
-| **Mistake** | Significant error (200-500 cp loss) |
-| **Blunder** | Major blunder (500+ cp loss) |
+## Troubleshooting
 
----
+- If you see peer dependency errors (ERESOLVE) during `npm install`, run with `--legacy-peer-deps` as shown above.
+- If `electron-squirrel-startup` or similar package gives `ETARGET` / not found errors, remove or update that dependency in `package.json`.
+- If evaluations are nonsense: that's expected with the mock engine. To get real evaluations, integrate Stockfish (see "Replace mock Stockfish" below).
 
-## 🧩 Puzzle System
+## Replace mock Stockfish with real engine (brief)
 
-### Difficulty Scaling
-- Start: 500-800 rating
-- Progress: Difficulty increases with success
-- Rating ranges: 500-3000 ELO
-- Based on Lichess puzzle mechanics
+1. Use a Stockfish WebAssembly build such as `stockfish.wasm` or `stockfish.wasm.js` and run it inside a web worker.
+2. Replace `src/services/StockfishWorker.ts` with an implementation that posts/receives UCI commands to/from the worker and exposes `evaluatePosition(fen, depth)` and `getBestMove(fen, depth)`.
+3. Ensure the worker is included in the build (adjust CRA config or use a bundler that supports importing web workers).
 
-### Themes
-- **Mate** - Mating combinations
-- **Fork** - Winning multiple pieces
-- **Pin** - Exploiting pinned pieces
-- **Skewer** - Reverse pin tactics
-- **Sacrifice** - Material sacrifice for advantage
-- **Defense** - Defensive tactics
+## Testing chess.com integration
 
----
+- The Chess.com API is public and rate-limited. `ChessComAPI.fetchUserGames(username)` fetches archives and then the latest archive.
+- If fetching returns an empty list, ensure the username is correct and the account has recent games in archives. Check browser console for network errors.
 
-## 🌐 API Integration
+## Development notes
 
-### Chess.com
-- **No authentication required** - Uses public API
-- **Endpoints**: `/pub/player/{username}/games`
-- **Offline fallback**: No internet needed for other features
+- Use `npm run react-start` for fast iteration in the browser.
+- Use `npm start` to launch both the React dev server and Electron (if you want the desktop experience).
 
-### Lichess Opening Book
-- **Master game statistics**
-- **Win/draw/loss rates**
-- **Popularity metrics**
-- **Cached locally** for performance
+## Contributing
+
+1. Open an issue describing the bug or feature.
+2. Create a branch and open a PR with tests and a description of the change.
 
 ---
 
-## 💾 Local Storage
+If you'd like, I can:
 
-All data stored locally in `~/.config/chessdaddy/`:
-- Puzzle progress and ratings
-- User preferences and settings
-- Chess.com username
-- Analysis history
-- Game annotations
+- Integrate a real Stockfish WASM worker and wire it into the app.
+- Improve PGN navigation (rewind/forward controls) and persistent move list UI.
+- Add unit tests for PGN parsing and move validation.
 
----
-
-## ⚙️ Configuration
-
-### Engine Settings
-Edit `src/services/StockfishWorker.ts`:
-```typescript
-threads: 4              // CPU threads to use
-hash: 256               // Hash table in MB
-multiPV: 1              // Number of variations
-analysisDepth: 20       // Default analysis depth
-```
-
-### Board Appearance
-Edit `src/styles/Chessboard.css`:
-```css
-/* Light square color */
-.square.light { background-color: #F0D9B5; }
-/* Dark square color */
-.square.dark { background-color: #B58863; }
-```
-
----
-
-## 🐛 Troubleshooting
-
-### "Stockfish not found"
-```bash
-# Verify stockfish.exe exists
-dir engines
-
-# Should show: stockfish.exe
-```
-
-### "Module not found" errors
-```bash
-rm -r node_modules
-npm cache clean --force
-npm install
-```
-
-### App won't start
-```bash
-# Check terminal for errors
-# Kill any stuck processes
-taskkill /F /IM node.exe
-taskkill /F /IM electron.exe
-
-# Clear cache and restart
-npm cache clean --force
-npm start
-```
-
-### Chess.com games not loading
-- Verify username spelling
-- Ensure account has public games
-- Check internet connection
-- Wait 30 seconds for API response
-
----
-
-## 📈 Performance
-
-- **Engine depth**: Limited to 30 for responsiveness
-- **Board rendering**: 60 FPS animations
-- **Analysis**: Real-time as you play
-- **Puzzle generation**: Cached locally
-- **Memory usage**: ~200-400 MB
-
----
-
-## 🔒 Privacy & Security
-
-- **No cloud processing** - Everything runs locally
-- **No data collection** - Your games stay private
-- **Open source** - Audit the code anytime
-- **Sandboxed** - Electron isolation enabled
-
----
-
-## 🚀 Future Features
-
-- [ ] Lichess.org integration
-- [ ] PGN export with annotations
-- [ ] Opening repertoire builder
-- [ ] Endgame tablebase support
-- [ ] Machine learning suggestions
-- [ ] Online multiplayer
-- [ ] Mobile companion app
-- [ ] Custom engine support
-
----
-
-## 📄 License
-
-MIT License - See LICENSE file for details
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Commit changes: `git commit -am 'Add new feature'`
-4. Push to branch: `git push origin feature/my-feature`
-5. Open a Pull Request
-
----
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/typp3212/chessdaddy/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/typp3212/chessdaddy/discussions)
-- **Email**: Contact through GitHub
-
----
-
-## 🙏 Credits
-
-- **Stockfish**: [stockfishchess.org](https://stockfishchess.org) - Powerful chess engine
-- **Chess.js**: Chess game validation and PGN parsing
-- **Electron**: Desktop application framework
-- **React**: UI framework
-- **Lichess**: Opening book data and puzzle concepts
-
----
-
-## 📝 Version History
-
-### v1.0.0 (2026-05-07)
-- Initial release
-- Stockfish 18 integration
-- Chess.com game analyzer
-- Puzzle system with rating progression
-- Opening explorer
-- Dark mode support
-- Complete offline functionality
-
----
-
-**Made with ♥ by typp3212**
-
-GitHub: [@typp3212](https://github.com/typp3212)  
-Repository: [typp3212/chessdaddy](https://github.com/typp3212/chessdaddy)
+Tell me which of the above you'd like me to do next and I'll implement it.
